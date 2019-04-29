@@ -24,8 +24,8 @@ object PerformPartition {
     val strategy = args(2)
     val lambda = args(3).toFloat
     val loadFactor = args(4).toDouble
-    val masterIP = "127.0.0.1"
-    val path = "hdfs://127.0.0.1:9000/tmp/"
+    val masterIP = args(5)
+    val path = "hdfs://"+masterIP+":9000/tmp/"
 
     val state = new CoordinatedPartitionState(numPartitions)
     val processors = Runtime.getRuntime.availableProcessors()
