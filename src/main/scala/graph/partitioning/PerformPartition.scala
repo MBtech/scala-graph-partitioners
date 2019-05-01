@@ -1,16 +1,25 @@
 package graph.partitioning
 
-import java.util.concurrent.{Executors, FutureTask, Future, TimeUnit}
+import java.net.URI
+import java.util.concurrent.{Executors, Future, FutureTask, TimeUnit}
 import java.util.concurrent.locks.Lock
+
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 import scala.collection.mutable
 import scala.io.Source
 
 object PerformPartition {
-  def readEdges(inputPath: String): List[Edge] ={
+  def readEdges(inputPath: String, masterIP: String): List[Edge] ={
 //    val edges: Array[Edge] = Array()
     val separator = "\t"
-    val lines = Source.fromFile(inputPath).getLines()
+    val hdfs = FileSystem.get(new URI("hdfs://"+masterIP+":9000/"), new Configuration())
+    val path = new Path(inputPath)
+    val stream = hdfs.open(path)
+    val source = Source.fromInputStream(stream)
+    val lines = source.getLines().toList
+//    val lines = Source.fromFile(inputPath).getLines()
     val edges = lines.map(line => {
       new Edge(line.split(separator)(0).toInt, line.split(separator)(1).toInt)
     })
@@ -32,7 +41,7 @@ object PerformPartition {
     println(processors)
     val executor = Executors.newFixedThreadPool(processors)
 
-    val dataset = readEdges(inputPath)
+    val dataset = readEdges(inputPath, masterIP)
     val n = dataset.size
     val subSize = n / processors + 1
 //    val dataset = List(new Edge(1, 2), new Edge(1, 3), new Edge(2, 3), new Edge(3, 4))
