@@ -22,6 +22,7 @@ class PartitionerThread(edgeList: List[Edge], state: PartitionState, algorithm: 
     println("Starting the partitioning process")
     for (t <- edgeList) {
       val pid = algorithm.getPartition(t.getSrc(), t.getDst(), numPartitions)
+//      println(pid)
       pid2Edges(pid).add(t)
 //      if (pid2Edges.keySet.contains(pid)){
 //        pid2Edges.update(pid, pid2Edges(pid):+t)

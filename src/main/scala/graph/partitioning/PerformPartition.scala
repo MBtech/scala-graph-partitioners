@@ -14,12 +14,12 @@ object PerformPartition {
   def readEdges(inputPath: String, masterIP: String): List[Edge] ={
 //    val edges: Array[Edge] = Array()
     val separator = "\t"
-    val hdfs = FileSystem.get(new URI("hdfs://"+masterIP+":9000/"), new Configuration())
-    val path = new Path(inputPath)
-    val stream = hdfs.open(path)
-    val source = Source.fromInputStream(stream)
-    val lines = source.getLines().toList
-//    val lines = Source.fromFile(inputPath).getLines()
+//    val hdfs = FileSystem.get(new URI("hdfs://"+masterIP+":9000/"), new Configuration())
+//    val path = new Path(inputPath)
+//    val stream = hdfs.open(path)
+//    val source = Source.fromInputStream(stream)
+//    val lines = source.getLines().toList
+    val lines = Source.fromFile(inputPath).getLines()
     val edges = lines.map(line => {
       new Edge(line.split(separator)(0).toInt, line.split(separator)(1).toInt)
     })
@@ -91,6 +91,23 @@ object PerformPartition {
         System.out.println("InterruptedException " + ex)
         ex.printStackTrace()
     }
+
+    println("Edge Distribution")
+    pid2Edges.foreach(arr => {
+      print(arr.length + " ")
+    })
+    println()
+
+    println("Vertex Distribution")
+    pid2Edges.foreach(arr => {
+      var v : mutable.Set[Long] = mutable.Set()
+      arr.foreach(e => {
+        v.add(e.getSrc())
+        v.add(e.getDst())
+      })
+      print(v.size+ " ")
+    })
+    println()
 
     println("Writing to HDFS now")
     for (i <- 0 to numPartitions-1){
